@@ -6,12 +6,15 @@
 #
 default: &default
   adapter: postgresql
-  pool: 400
-  timeout: 5000
+  encoding: unicode
+  database: postgres
+  pool: 5
+  username: postgres
+  password:
+  host: db
 
 development:
   <<: *default
-  database: playground_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

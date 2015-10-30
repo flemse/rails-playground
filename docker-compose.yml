@@ -1,0 +1,33 @@
+mongodb:
+  image: mongo
+db:
+  image: postgres:9.4.1
+  ports:
+    - "5432:5432"
+web:
+  build: .
+  command: bin/rails server --port 80 --binding 0.0.0.0
+  environment:
+    - VIRTUAL_HOST=app.docker
+  ports:
+    - "80"
+  links:
+    - db
+  volumes:
+    - .:/app
+errbit:
+  image: griff/errbit
+  ports:
+    - "80"
+  environment:
+    - VIRTUAL_HOST=errbit.intern.docker
+  links:
+    - mongodb
+graphite:
+  image: kamon/grafana_graphite
+  ports:
+    - "80"
+    - "8125:8125/udp"
+    - "8126:8126"
+  environment:
+    - VIRTUAL_HOST=graphite.intern.docker
