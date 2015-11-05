@@ -1,5 +1,13 @@
-mongodb:
-  image: mongo
+mongodata:
+  image: mongo:3.0.4
+  volumes:
+    - /data/db
+  command: --break-mongo
+mongo:
+  command: --smallfiles --rest
+  image: mongo:3.0.4
+  volumes_from:
+    - mongodata
 db:
   image: postgres:9.4.1
   ports:
@@ -26,7 +34,7 @@ errbit:
   environment:
     - VIRTUAL_HOST=errbit.intern.docker
   links:
-    - mongodb
+    - mongo:mongodb
 graphite:
   image: kamon/grafana_graphite
   ports:
