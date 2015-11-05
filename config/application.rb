@@ -10,7 +10,7 @@ Bundler.require(*Rails.groups)
 
 module Playground
   class Application < Rails::Application
-    statsd = Statsd.new 'graphite.intern.docker', 8125
+    statsd = Statsd.new ENV['GRAPHITE_1_PORT_8125_UDP_ADDR'], 8125
     config.trashed.statsd = statsd
     config.trashed.timing_dimensions = ->(env) do
       # Rails 3 and 4 set this. Other Rack endpoints won't have it.

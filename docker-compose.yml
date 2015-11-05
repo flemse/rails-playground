@@ -3,22 +3,26 @@ mongodb:
 db:
   image: postgres:9.4.1
   ports:
-    - "5432:5432"
+    - "5432"
+redis:
+  image: redis
 web:
   build: .
-  command: bin/rails server --port 80 --binding 0.0.0.0
+  dockerfile: Dockerfile.web
+  command: bin/rails server --binding=0.0.0.0
   environment:
     - VIRTUAL_HOST=app.docker
   ports:
-    - "80"
+    - "3000"
   links:
     - db
+    - graphite
   volumes:
     - .:/app
 errbit:
   image: griff/errbit
   ports:
-    - "80"
+    - "3000"
   environment:
     - VIRTUAL_HOST=errbit.intern.docker
   links:
@@ -27,7 +31,18 @@ graphite:
   image: kamon/grafana_graphite
   ports:
     - "80"
-    - "8125:8125/udp"
-    - "8126:8126"
+  expose:
+    - "8125/udp"
+    - "8126"
   environment:
     - VIRTUAL_HOST=graphite.intern.docker
+redis_mon:
+  build: .
+  dockerfile: Dockerfile.redis_mon
+  command: sh -c "redis-stat $REDIS_1_PORT_6379_TCP_ADDR:$REDIS_1_PORT_6379_TCP_PORT --server"
+  links:
+    - redis
+  ports:
+    - "63790"
+  environment:
+    - VIRTUAL_HOST=redis.mon.intern.docker
